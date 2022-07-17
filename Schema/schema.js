@@ -11,9 +11,9 @@ const {
 // dummy data
 
 let books = [
-    { name: 'Name of the Wind', genre: 'Fantasy', id: '1' },
-    { name: 'The Final Empire', genre: 'Fantasy', id: '2' },
-    { name: 'The Long Earth', genre: 'Sci-Fi', id: '3' }
+    { name: 'Name of the Wind', genre: 'Fantasy', id: '1', authorId: '1' },
+    { name: 'The Final Empire', genre: 'Fantasy', id: '2', authorId: '2' },
+    { name: 'The Long Earth', genre: 'Sci-Fi', id: '3', authorId: '3' }
 ];
 
 let authors = [
@@ -21,6 +21,24 @@ let authors = [
     { name: 'Brandon Sanderson', age: 42, id: '2' },
     { name: 'Terry Pratchett', age: 66, id: '3' },
 ]
+
+
+const BookType = new GraphQLObjectType({
+    name: 'Book',
+    fields: () => ({
+        id: { type: GraphQLID },
+        name: { type: GraphQLString },
+        genre: { type: GraphQLString },
+        // every book has an author. this makes the relation between the author and the book
+        author: {
+            type: AuthorType,
+            // here the resolve function takes the authorId from the parent which it is related to and matches with the author in the authors list
+            resolve(parent, args) {
+                return authors.find((author) => author.id === parent.authorId);
+            }
+        }
+    })
+});
 
 const AuthorType = new GraphQLObjectType({
     name: 'Author',
@@ -30,14 +48,6 @@ const AuthorType = new GraphQLObjectType({
         age: { type: GraphQLInt }
     })
 })
-const BookType = new GraphQLObjectType({
-    name: 'Book',
-    fields: () => ({
-        id: { type: GraphQLID },
-        name: { type: GraphQLString },
-        genre: { type: GraphQLString }
-    })
-});
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
